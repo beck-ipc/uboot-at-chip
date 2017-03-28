@@ -861,7 +861,6 @@ int enable_fec_anatop_clock(int fec_id, enum enet_freq freq)
 		return -EINVAL;
 
 	reg = readl(&anatop->pll_enet);
-	reg &= ~BM_ANADIG_PLL_ENET_DIV_SELECT;
 
 	if (0 == fec_id) {
 		reg &= ~BM_ANADIG_PLL_ENET_DIV_SELECT;
