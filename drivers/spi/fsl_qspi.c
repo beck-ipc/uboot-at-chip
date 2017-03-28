@@ -13,6 +13,7 @@
 #include <spi.h>
 
 #include <asm/io.h>
+#include <dm/uclass.h>
 
 #define QUADSPI_AHBMAP_BANK_MAXSIZE SZ_64M
 
@@ -691,23 +692,33 @@ fsl_qspi_runcmd(struct fsl_qspi *q, u8 cmd, unsigned int addr, int len)
 	u32 reg, reg2;
 	int err;
 	int bank_id;
+	int bus;
+	int cs;
 
 	/* check the SR first, wait previous cmd completed*/
 	do {
 		reg2 = readl(base + QUADSPI_SR);
 		if (reg2 & (QUADSPI_SR_IP_ACC_MASK | QUADSPI_SR_AHB_ACC_MASK)) {
 			udelay(1);
-			printf("The controller is busy, 0x%x\n", reg2);
+			//printf("The controller is busy, 0x%x\n", reg2);
 			continue;
 		}
 		break;
 	} while (1);
 
-	/* save the reg */
+ 	/* save the reg */
 	reg = readl(base + QUADSPI_MCR);
 
 	/* get the bank index */
-	bank_id = ((q->slave.bus) << 1) + (q->slave.cs);
+	#ifdef CONFIG_DM_SPI
+	bus = uclass_resolve_seq(q->slave.dev);
+	cs = spi_chip_select(q->slave.dev);
+	#else
+	bus = q->slave.bus;
+	cs = q->slave.cs;
+	#endif
+
+	bank_id = ((bus) << 1) + (cs);	
 
 	writel(q->bank_memmap_phy[bank_id] + addr, base + QUADSPI_SFAR);
 	writel(QUADSPI_RBCT_WMRK_MASK | QUADSPI_RBCT_RXBRD_USEIPS,
@@ -750,9 +761,19 @@ static void fsl_qspi_ahb_read(struct fsl_qspi *q,
 	unsigned int addr, int len, u8 *rxbuf)
 {
 	int bank_id;
+	int bus;
+	int cs;
 
 	/* get the bank index */
-	bank_id = ((q->slave.bus) << 1) + (q->slave.cs);
+	#ifdef CONFIG_DM_SPI
+	bus = uclass_resolve_seq(q->slave.dev);
+	cs = spi_chip_select(q->slave.dev);
+	#else
+	bus = q->slave.bus;
+	cs = q->slave.cs;
+	#endif
+
+	bank_id = ((bus) << 1) + (cs);
 
 	/* Read out the data directly from the AHB buffer.*/
 	memcpy(rxbuf, (u8 *)(q->bank_memmap_phy[bank_id] + addr), len);
