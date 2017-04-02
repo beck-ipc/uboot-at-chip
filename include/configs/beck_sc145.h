@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Freescale Semiconductor, Inc.
+ * Copyright (C) 2017 kernel concepts GmbH
  *
  * Configuration settings for the Beck-IPC SC145 i.MX6UL board.
  *
@@ -124,7 +125,7 @@
 #define CONFIG_ZERO_BOOTDELAY_CHECK
 #define CONFIG_AUTOBOOT_KEYED
 #define CONFIG_AUTOBOOT_STOP_STR "\003"
-#define CONFIG_BOOTDELAY		0
+#define CONFIG_BOOTDELAY		1
 
 #define CONFIG_LOADADDR			0x80800000
 #define CONFIG_SYS_TEXT_BASE		0x87800000
@@ -288,11 +289,17 @@
 /* FLASH and environment organization */
 #define CONFIG_SYS_NO_FLASH
 
-#define CONFIG_ENV_SIZE			SZ_8K
+#define CONFIG_ENV_SIZE			SZ_64K
+#define MTDIDS_DEFAULT "nor0=nor0"
+#define MTDPARTS_DEFAULT "mtdparts=nor0:4k(config)," \
+						"508k(u-boot)," \
+						"64k(env)," \
+						"-(rootfs)"
 
 #ifdef CONFIG_SYS_BOOT_QSPI
 #define CONFIG_FSL_QSPI
 #define CONFIG_ENV_IS_IN_SPI_FLASH
+
 #elif defined CONFIG_SYS_BOOT_NAND
 #define CONFIG_SYS_USE_NAND
 #define CONFIG_ENV_IS_IN_NAND
@@ -302,6 +309,7 @@
 #endif
 
 #define FSL_QSPI_FLASH_SIZE             SZ_64M
+
 #define CONFIG_SPI_FLASH
 #define CONFIG_SPI_FLASH_MTD
 #define CONFIG_CMD_UBI
@@ -403,8 +411,43 @@
 #define CONFIG_USB_MAX_CONTROLLER_COUNT 2
 #endif
 
-#if defined(CONFIG_ANDROID_SUPPORT)
-#include "mx6ul_14x14_evk_android.h"
+#define CONFIG_CMD_BOOTI
+#define CONFIG_USB_DEVICE
+#define CONFIG_IMX_UDC		       1
+
+#define CONFIG_CMD_FASTBOOT
+#define CONFIG_FASTBOOT		       1
+#define CONFIG_FASTBOOT_VENDOR_ID      0x18d1
+#define CONFIG_FASTBOOT_PRODUCT_ID     0x0d02
+#define CONFIG_FASTBOOT_BCD_DEVICE     0x311
+#define CONFIG_FASTBOOT_MANUFACTURER_STR  "Freescale"
+#define CONFIG_FASTBOOT_PRODUCT_NAME_STR "i.MX6UL EVK Board"
+#define CONFIG_FASTBOOT_INTERFACE_STR	 "Android fastboot"
+#define CONFIG_FASTBOOT_CONFIGURATION_STR  "Android fastboot"
+#define CONFIG_FASTBOOT_SERIAL_NUM	"12345"
+#define CONFIG_FASTBOOT_SATA_NO		 0
+
+#if defined CONFIG_SYS_BOOT_NAND
+#define CONFIG_FASTBOOT_STORAGE_NAND
+#else
+#define CONFIG_FASTBOOT_STORAGE_MMC
 #endif
+
+/*  For system.img growing up more than 256MB, more buffer needs
+ *   to receive the system.img */
+#define CONFIG_FASTBOOT_TRANSFER_BUF	0x84000000
+#define CONFIG_FASTBOOT_TRANSFER_BUF_SIZE 0x19000000 /* 400M byte */
+
+#define CONFIG_ANDROID_MAIN_MMC_BUS 2
+#define CONFIG_ANDROID_BOOT_PARTITION_MMC 1
+#define CONFIG_ANDROID_SYSTEM_PARTITION_MMC 5
+#define CONFIG_ANDROID_RECOVERY_PARTITION_MMC 2
+#define CONFIG_ANDROID_CACHE_PARTITION_MMC 6
+#define CONFIG_ANDROID_DATA_PARTITION_MMC 6
+
+#if defined(CONFIG_FASTBOOT_STORAGE_NAND)
+#define ANDROID_FASTBOOT_NAND_PARTS "16m@64m(boot) 16m@80m(recovery) 810m@96m(android_root)ubifs"
+#endif
+
 
 #endif
