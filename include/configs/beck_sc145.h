@@ -291,8 +291,7 @@
 
 #define CONFIG_ENV_SIZE			SZ_64K
 #define MTDIDS_DEFAULT "nor0=nor0"
-#define MTDPARTS_DEFAULT "mtdparts=nor0:4k(config)," \
-						"508k(u-boot)," \
+#define MTDPARTS_DEFAULT "mtdparts=nor0:512k(u-boot)," \
 						"64k(env)," \
 						"-(rootfs)"
 
