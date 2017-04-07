@@ -128,7 +128,7 @@
 #define CONFIG_BOOTDELAY		1
 
 #define CONFIG_LOADADDR			0x80800000
-#define CONFIG_SYS_TEXT_BASE		0x87800000
+#define CONFIG_SYS_TEXT_BASE	0x87800000
 
 #define CONFIG_SYS_MMC_IMG_LOAD_PART	1
 #ifdef CONFIG_SYS_BOOT_NAND
@@ -163,7 +163,7 @@
 	"\0 console=ttymxc3,115200\0" \
 	"fdtaddr=0x83000000\0" \
 	"bootdelay=1\0" \
-    "ethact=FEC0\0"\
+    "ethact=FEC1\0"\
     "update_bootloader=dhcp cfg-u-boot-sc145.imx && sf probe && sf erase 0 0x00080000 && sf write ${fileaddr} 0 ${filesize}\0"\
     "kernelfile=uImage\0" \
     "fdtfile=imx6ul-sc145-db150.dtb\0" \
@@ -205,8 +205,8 @@
 #define CONFIG_STACKSIZE		SZ_128K
 
 /* Physical Memory Map */
-#define CONFIG_NR_DRAM_BANKS		1
-#define PHYS_SDRAM			MMDC0_ARB_BASE_ADDR
+#define CONFIG_NR_DRAM_BANKS	1
+#define PHYS_SDRAM				MMDC0_ARB_BASE_ADDR
 
 #define CONFIG_SYS_SDRAM_BASE		PHYS_SDRAM
 #define CONFIG_SYS_INIT_RAM_ADDR	IRAM_BASE_ADDR
