@@ -1063,8 +1063,8 @@ endif
 u-boot-img.bin: spl/u-boot-spl.bin u-boot.img FORCE
 	$(call if_changed,cat)
 
-cmd_qspi = ./mkqspi-image.sh qspi-nor-micron-n25q512ax3.imx u-boot.imx 
-	
+cmd_qspi = $(objtree)/mkqspi-image.sh qspi-nor-micron-n25q512ax3.imx u-boot.imx 
+
 qspi-u-boot.imx: u-boot.imx FORCE
 	$(call if_changed,qspi)
 
