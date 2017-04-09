@@ -164,7 +164,8 @@
 	"fdtaddr=0x83000000\0" \
 	"bootdelay=1\0" \
     "ethact=FEC1\0"\
-    "update_bootloader=dhcp cfg-u-boot-sc145.imx && sf probe && sf erase 0 0x00080000 && sf write ${fileaddr} 0 ${filesize}\0"\
+    "update_bootloader=dhcp qspi-u-boot.imx && sf probe && sf erase 0 0x00080000 && sf write ${fileaddr} 0 ${filesize}\0"\
+    "update_ubi=dhcp rootfs-sc145.ubifs && sf probe && sf erase 0x00090000 0x03f70000 && ubi part rootfs && ubi create rootfs && ubi write ${fileaddr} rootfs ${filesize}\0"\
     "kernelfile=uImage\0" \
     "fdtfile=imx6ul-sc145-db150.dtb\0" \
 	"init_ubifs=sf probe; mtdparts; ubi part filesystem; ubifsmount ubi0:rootfs\0" \
