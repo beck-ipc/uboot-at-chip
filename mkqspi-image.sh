@@ -33,9 +33,8 @@ fi
 dd if=/dev/zero of=pad1k bs=1k count=1
 cat pad1k ${CFGBLOCK} > tmpimg
 dd if=tmpimg of=tmpimg2 bs=4k count=1 conv=sync
-cat tmpimg2 ${UBOOTIMX} > cfg-${UBOOTIMX}
+cat tmpimg2 ${UBOOTIMX} > qspi-${UBOOTIMX}
 
 rm pad1k tmpimg tmpimg2
 
 echo Wrote output to qspi-${UBOOTIMX}
-
