@@ -1,0 +1,15 @@
+if TARGET_BECK_SC165
+
+config SYS_BOARD
+	default "sc165"
+
+config SYS_VENDOR
+	default "beck"
+
+config SYS_SOC
+	default "mx6"
+
+config SYS_CONFIG_NAME
+	default "beck_sc165"
+
+endif
