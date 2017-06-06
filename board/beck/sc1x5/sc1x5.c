@@ -521,8 +521,13 @@ u32 get_board_rev(void)
 
 int checkboard(void)
 {
+#if defined (CONFIG_TARGET_BECK_SC145)
 	puts("Board: Beck SC145\n");
-
+#elif defined (CONFIG_TARGET_BECK_SC165)
+	puts("Board: Beck SC165\n");
+#else
+	#error "Unknown target"
+#endif
 	return 0;
 }
 

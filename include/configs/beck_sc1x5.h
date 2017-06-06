@@ -1,0 +1,354 @@
+/*
+ * Copyright (C) 2015 Freescale Semiconductor, Inc.
+ * Copyright (C) 2017 kernel concepts GmbH
+ *
+ * Configuration settings for the Beck-IPC SC1x5 i.MX6UL board family.
+ *
+ * SPDX-License-Identifier:	GPL-2.0+
+ */
+#ifndef __BECK_SC1x5_CONFIG_H
+#define __BECK_SC1x5_CONFIG_H
+
+
+#include <asm/arch/imx-regs.h>
+#include <linux/sizes.h>
+#include "mx6_common.h"
+#include <asm/imx-common/gpio.h>
+
+#define CONFIG_MX6
+#define CONFIG_ROM_UNIFIED_SECTIONS
+#define CONFIG_SYS_GENERIC_BOARD
+#define CONFIG_DISPLAY_CPUINFO
+#define CONFIG_DISPLAY_BOARDINFO
+/* #define CONFIG_HW_WATCHDOG */
+/* #define CONFIG_IMX_WATCHDOG */
+
+/* DCDC used on EVK, no PMIC */
+#undef CONFIG_LDO_BYPASS_CHECK
+
+/* uncomment for PLUGIN mode support */
+/* #define CONFIG_USE_PLUGIN */
+
+/* uncomment for SECURE mode support */
+/* #define CONFIG_SECURE_BOOT */
+
+#ifdef CONFIG_SECURE_BOOT
+#ifndef CONFIG_CSF_SIZE
+#define CONFIG_CSF_SIZE 0x4000
+#endif
+#endif
+
+#define CONFIG_CMDLINE_TAG
+#define CONFIG_SETUP_MEMORY_TAGS
+#define CONFIG_INITRD_TAG
+#define CONFIG_REVISION_TAG
+
+/* Size of malloc() pool */
+#define CONFIG_SYS_MALLOC_LEN		(16 * SZ_1M)
+
+#define CONFIG_BOARD_EARLY_INIT_F
+#define CONFIG_BOARD_LATE_INIT
+#define CONFIG_MXC_GPIO
+
+#define CONFIG_MXC_UART
+#define CONFIG_MXC_UART_BASE    UART4_BASE
+
+/* allow to overwrite serial and ethaddr */
+#define CONFIG_ENV_OVERWRITE
+#define CONFIG_CONS_INDEX		1
+#define CONFIG_BAUDRATE			115200
+
+#define CONFIG_CMD_FUSE
+#ifdef CONFIG_CMD_FUSE
+#define CONFIG_MXC_OCOTP
+#endif
+
+/* MMC Configs */
+#define CONFIG_FSL_USDHC
+#ifdef CONFIG_FSL_USDHC
+#define CONFIG_FSL_ESDHC
+#define CONFIG_SYS_FSL_ESDHC_ADDR	USDHC1_BASE_ADDR
+#define CONFIG_SYS_FSL_USDHC_NUM	1
+
+#define CONFIG_MMC
+#define CONFIG_CMD_MMC
+#define CONFIG_GENERIC_MMC
+#define CONFIG_CMD_FAT
+#define CONFIG_DOS_PARTITION
+#define CONFIG_SUPPORT_EMMC_BOOT /* eMMC specific */
+#endif
+
+#undef CONFIG_BOOTM_NETBSD
+#undef CONFIG_BOOTM_PLAN9
+#undef CONFIG_BOOTM_RTEMS
+
+#undef CONFIG_CMD_EXPORTENV
+#undef CONFIG_CMD_IMPORTENV
+
+#define CONFIG_CMD_NET
+#ifdef CONFIG_CMD_NET
+#define CONFIG_CMD_PING
+#define CONFIG_CMD_DHCP
+#define CONFIG_CMD_MII
+#define CONFIG_FEC_MXC
+#define CONFIG_MII
+#define CONFIG_FEC_ENET_DEV 0
+
+#if (CONFIG_FEC_ENET_DEV == 0)
+#define IMX_FEC_BASE			ENET_BASE_ADDR
+#define CONFIG_FEC_MXC_PHYADDR          0x0
+#define CONFIG_FEC_XCV_TYPE             RMII
+#elif (CONFIG_FEC_ENET_DEV == 1)
+#define IMX_FEC_BASE			ENET2_BASE_ADDR
+#define CONFIG_FEC_MXC_PHYADDR          0x2
+#define CONFIG_FEC_XCV_TYPE             RMII
+#endif
+#define CONFIG_ETHPRIME                 "FEC"
+
+#define CONFIG_PHYLIB
+#define CONFIG_FEC_DMA_MINALIGN		64
+#endif
+
+/* allow to overwrite serial and ethaddr */
+#define CONFIG_ENV_OVERWRITE
+#define CONFIG_CONS_INDEX		1
+
+/* #define CONFIG_VIDEO */
+
+/* Command definition */
+#include <config_cmd_default.h>
+
+#undef CONFIG_CMD_IMLS
+
+#define CONFIG_ZERO_BOOTDELAY_CHECK
+#define CONFIG_AUTOBOOT_KEYED
+#define CONFIG_AUTOBOOT_STOP_STR "\003"
+#define CONFIG_BOOTDELAY		1
+
+#define CONFIG_LOADADDR			0x80800000
+#define CONFIG_SYS_TEXT_BASE	0x87800000
+
+#define CONFIG_SYS_MMC_IMG_LOAD_PART	1
+#ifdef CONFIG_SYS_BOOT_NAND
+#define CONFIG_MFG_NAND_PARTITION "mtdparts=gpmi-nand:64m(boot),16m(kernel),16m(dtb),-(rootfs) "
+#else
+#define CONFIG_MFG_NAND_PARTITION ""
+#endif
+
+#ifdef CONFIG_VIDEO
+#define CONFIG_VIDEO_MODE \
+	"panel=TFT43AB\0"
+#else
+#define CONFIG_VIDEO_MODE ""
+#endif
+
+#define CONFIG_MFG_ENV_SETTINGS \
+	"mfgtool_args=setenv bootargs console=${console},${baudrate} " \
+		"rdinit=/linuxrc " \
+		"g_mass_storage.stall=0 g_mass_storage.removable=1 " \
+		"g_mass_storage.idVendor=0x066F g_mass_storage.idProduct=0x37FF "\
+		"g_mass_storage.iSerialNumber=\"\" "\
+		CONFIG_MFG_NAND_PARTITION \
+		"clk_ignore_unused "\
+		"\0" \
+	"bootcmd_mfg=run mfgtool_args;bootz ${loadaddr} ${initrd_addr} ${fdt_addr};\0" \
+	"enet_phy_addr=1\0"
+
+#define CONFIG_EXTRA_ENV_SETTINGS \
+	CONFIG_MFG_ENV_SETTINGS \
+	CONFIG_VIDEO_MODE \
+	"mtdparts=" MTDPARTS_DEFAULT \
+	"\0 console=ttymxc3,115200\0" \
+	"fdtaddr=0x83000000\0" \
+	"bootdelay=1\0" \
+    "ethact=FEC1\0"\
+    "update_bootloader=dhcp qspi-u-boot.imx && sf probe && sf erase 0 0x00080000 && sf write ${fileaddr} 0 ${filesize}\0"\
+    "update_ubi=dhcp rootfs-" BOARD_STR ".ubifs && sf probe && sf erase 0x00090000 0x03f70000 && ubi part filesystem && ubi create rootfs && ubi write ${fileaddr} rootfs ${filesize}\0"\
+    "kernelfile=uImage\0" \
+    "fdtfile=imx6ul-" BOARD_STR "-db150.dtb\0" \
+	"init_ubifs=sf probe; mtdparts; ubi part filesystem; ubifsmount ubi0:rootfs\0" \
+	"nfspath=/srv/nfs/rootfs-" BOARD_STR "\0" \
+	"load_bootfiles_mmc=ext2load mmc $mmc_dev:3 ${fdtaddr} /boot/${fdtfile} ; ext2load mmc $mmc_dev:3 ${loadaddr} /boot/${kernelfile};\0" \
+	"load_bootfiles_tftp=tftp ${fdtaddr} ${fdtfile}; tftp ${kernelfile};\0" \
+	"load_bootfiles_ubifs=ubifsload ${fdtaddr} /boot/${fdtfile}; ubifsload ${loadaddr} /boot/${kernelfile};\0" \
+    "bootcmd_mmc=run load_bootfiles_mmc; setenv bootargs ${mtdparts} root=" CONFIG_MMCROOT " rootwait " \
+              "console=${console}; bootm ${loadaddr} - ${fdtaddr}\0" \
+	"bootcmd_nfs=run load_bootfiles_tftp; setenv bootargs console=${console} ${mtdparts} fec.macaddr=${ethaddr_array} " \
+	          "ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}::eth0:off root=/dev/nfs rw " \
+              "nfsroot=${serverip}:${nfspath},v3,tcp; " \
+			  "bootm ${loadaddr} - ${fdtaddr}\0" \
+	"bootcmd_ubifs=run init_ubifs; run load_bootfiles_ubifs; setenv bootargs ${mtdparts} console=${console} " \
+              "ubi.mtd=2 root=ubi0:rootfs rootfstype=ubifs; bootm ${loadaddr} - ${fdtaddr}\0" \
+	"bootcmd=run bootcmd_ubifs\0 " \
+
+/* Miscellaneous configurable options */
+#define CONFIG_SYS_LONGHELP
+#define CONFIG_SYS_HUSH_PARSER
+#define CONFIG_SYS_PROMPT		"=> "
+#define CONFIG_AUTO_COMPLETE
+#define CONFIG_SYS_CBSIZE		1024
+
+/* Print Buffer Size */
+#define CONFIG_SYS_PBSIZE (CONFIG_SYS_CBSIZE + sizeof(CONFIG_SYS_PROMPT) + 16)
+#define CONFIG_SYS_MAXARGS		256
+#define CONFIG_SYS_BARGSIZE CONFIG_SYS_CBSIZE
+
+#define CONFIG_CMD_MEMTEST
+#define CONFIG_SYS_MEMTEST_START	0x80000000
+#define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_MEMTEST_START + 0x10000000)
+
+#define CONFIG_SYS_LOAD_ADDR		CONFIG_LOADADDR
+#define CONFIG_SYS_HZ			1000
+
+#define CONFIG_CMDLINE_EDITING
+#define CONFIG_STACKSIZE		SZ_128K
+
+/* Physical Memory Map */
+#define CONFIG_NR_DRAM_BANKS	1
+#define PHYS_SDRAM				MMDC0_ARB_BASE_ADDR
+
+#define CONFIG_SYS_SDRAM_BASE		PHYS_SDRAM
+#define CONFIG_SYS_INIT_RAM_ADDR	IRAM_BASE_ADDR
+#define CONFIG_SYS_INIT_RAM_SIZE	IRAM_SIZE
+
+#define CONFIG_SYS_INIT_SP_OFFSET \
+	(CONFIG_SYS_INIT_RAM_SIZE - GENERATED_GBL_DATA_SIZE)
+#define CONFIG_SYS_INIT_SP_ADDR \
+	(CONFIG_SYS_INIT_RAM_ADDR + CONFIG_SYS_INIT_SP_OFFSET)
+
+/* FLASH and environment organization */
+#define CONFIG_SYS_NO_FLASH
+
+#define CONFIG_ENV_SIZE		SZ_64K
+#define MTDIDS_DEFAULT		"nor0=21e0000.qspi"
+#define MTDPARTS_DEFAULT 	"mtdparts=21e0000.qspi:512k(bootloader)," \
+							"64k(environment)," \
+							"-(filesystem)"
+
+#ifdef CONFIG_SYS_BOOT_QSPI
+#define CONFIG_FSL_QSPI
+#define CONFIG_ENV_IS_IN_SPI_FLASH
+#else
+#define CONFIG_FSL_QSPI
+#define CONFIG_ENV_IS_IN_MMC
+#endif
+
+#define CONFIG_SPI_FLASH
+#define CONFIG_SPI_FLASH_MTD
+#define CONFIG_CMD_UBI
+#define CONFIG_CMD_UBIFS
+#define CONFIG_RBTREE
+#define CONFIG_MTD_DEVICE
+#define CONFIG_MTD_PARTITIONS
+#define CONFIG_CMD_MTDPARTS
+#define CONFIG_LZO
+
+#ifdef CONFIG_FSL_QSPI
+#define FSL_QSPI_FLASH_SIZE		SZ_64M
+#define CONFIG_QSPI_BASE		QSPI1_BASE_ADDR
+#define CONFIG_QSPI_MEMMAP_BASE	QSPI1_ARB_BASE_ADDR
+
+#define CONFIG_CMD_SF
+#define	CONFIG_SPI_FLASH
+#define	CONFIG_SPI_FLASH_STMICRO
+#define	CONFIG_SPI_FLASH_BAR
+#define	CONFIG_SF_DEFAULT_BUS		0
+#define	CONFIG_SF_DEFAULT_CS		0
+#define	CONFIG_SF_DEFAULT_SPEED		40000000
+#define	CONFIG_SF_DEFAULT_MODE		SPI_MODE_0
+#endif
+
+#if defined(CONFIG_ENV_IS_IN_MMC)
+#define CONFIG_ENV_OFFSET		(8 * SZ_64K)
+#elif defined(CONFIG_ENV_IS_IN_SPI_FLASH)
+#undef CONFIG_ENV_SIZE
+#define CONFIG_ENV_OFFSET		(512 * 1024)
+#define CONFIG_ENV_SECT_SIZE	(64 * 1024)
+#define CONFIG_ENV_SIZE			(64 * 1024)
+#define CONFIG_ENV_SPI_BUS		CONFIG_SF_DEFAULT_BUS
+#define CONFIG_ENV_SPI_CS		CONFIG_SF_DEFAULT_CS
+#define CONFIG_ENV_SPI_MODE		CONFIG_SF_DEFAULT_MODE
+#define CONFIG_ENV_SPI_MAX_HZ	CONFIG_SF_DEFAULT_SPEED
+#endif
+
+#define CONFIG_SYS_MMC_ENV_DEV	0   /* USDHC1 */
+#define CONFIG_SYS_MMC_ENV_PART	0	/* user area */
+#define CONFIG_MMCROOT			"/dev/mmcblk0p3"  /* USDHC1 */
+
+#define CONFIG_OF_LIBFDT
+#define CONFIG_CMD_BOOTZ
+
+#define CONFIG_CMD_BMODE
+
+#ifndef CONFIG_SYS_DCACHE_OFF
+#define CONFIG_CMD_CACHE
+#endif
+
+#ifdef CONFIG_VIDEO
+#define	CONFIG_CFB_CONSOLE
+#define	CONFIG_VIDEO_MXS
+#define	CONFIG_VIDEO_LOGO
+#define	CONFIG_VIDEO_SW_CURSOR
+#define	CONFIG_VGA_AS_SINGLE_DEVICE
+#define	CONFIG_SYS_CONSOLE_IS_IN_ENV
+#define	CONFIG_SPLASH_SCREEN
+#define CONFIG_SPLASH_SCREEN_ALIGN
+#define	CONFIG_CMD_BMP
+#define	CONFIG_BMP_16BPP
+#define	CONFIG_VIDEO_BMP_RLE8
+#define CONFIG_VIDEO_BMP_LOGO
+#endif
+
+/* USB Configs */
+#define CONFIG_CMD_USB
+#ifdef CONFIG_CMD_USB
+#define CONFIG_USB_EHCI
+#define CONFIG_USB_EHCI_MX6
+#define CONFIG_USB_STORAGE
+#define CONFIG_EHCI_HCD_INIT_AFTER_RESET
+#define CONFIG_USB_HOST_ETHER
+#define CONFIG_USB_ETHER_ASIX
+#define CONFIG_MXC_USB_PORTSC  (PORT_PTS_UTMI | PORT_PTS_PTW)
+#define CONFIG_MXC_USB_FLAGS   0
+#define CONFIG_USB_MAX_CONTROLLER_COUNT 2
+#endif
+
+#define CONFIG_CMD_BOOTI
+#define CONFIG_USB_DEVICE
+#define CONFIG_IMX_UDC		       1
+
+/* #define CONFIG_CMD_FASTBOOT */
+/* #define CONFIG_FASTBOOT		       1 */
+#define CONFIG_FASTBOOT_VENDOR_ID      0x18d1
+#define CONFIG_FASTBOOT_PRODUCT_ID     0x0d02
+#define CONFIG_FASTBOOT_BCD_DEVICE     0x311
+#define CONFIG_FASTBOOT_MANUFACTURER_STR  "Freescale"
+#define CONFIG_FASTBOOT_PRODUCT_NAME_STR "i.MX6UL EVK Board"
+#define CONFIG_FASTBOOT_INTERFACE_STR	 "Android fastboot"
+#define CONFIG_FASTBOOT_CONFIGURATION_STR  "Android fastboot"
+#define CONFIG_FASTBOOT_SERIAL_NUM	"12345"
+#define CONFIG_FASTBOOT_SATA_NO		 0
+
+#if defined CONFIG_SYS_BOOT_NAND
+#define CONFIG_FASTBOOT_STORAGE_NAND
+#else
+#define CONFIG_FASTBOOT_STORAGE_MMC
+#endif
+
+/*  For system.img growing up more than 256MB, more buffer needs
+ *   to receive the system.img */
+#define CONFIG_FASTBOOT_TRANSFER_BUF	0x84000000
+#define CONFIG_FASTBOOT_TRANSFER_BUF_SIZE 0x19000000 /* 400M byte */
+
+#define CONFIG_ANDROID_MAIN_MMC_BUS 2
+#define CONFIG_ANDROID_BOOT_PARTITION_MMC 1
+#define CONFIG_ANDROID_SYSTEM_PARTITION_MMC 5
+#define CONFIG_ANDROID_RECOVERY_PARTITION_MMC 2
+#define CONFIG_ANDROID_CACHE_PARTITION_MMC 6
+#define CONFIG_ANDROID_DATA_PARTITION_MMC 6
+
+#if defined(CONFIG_FASTBOOT_STORAGE_NAND)
+#define ANDROID_FASTBOOT_NAND_PARTS "16m@64m(boot) 16m@80m(recovery) 810m@96m(android_root)ubifs"
+#endif
+
+#endif

@@ -51,13 +51,13 @@
 	str r1, [r0, #0x1C]
 	ldr r1, =0xA1390003
 	str r1, [r0, #0x800]
-	ldr r1, =0x00070007
+	ldr r1, =0x00070000
 	str r1, [r0, #0x80C]
-	ldr r1, =0x41490145
+	ldr r1, =0x41380134
 	str r1, [r0, #0x83C]
-	ldr r1, =0x40404546
+	ldr r1, =0x40404E52
 	str r1, [r0, #0x848]
-	ldr r1, =0x4040524D
+	ldr r1, =0x40404C40
 	str r1, [r0, #0x850]
 	ldr r1, =0x33333333
 	str r1, [r0, #0x81C]
@@ -89,9 +89,9 @@
 	str r1, [r0, #0x02C]
 	ldr r1, =0x006B1023
 	str r1, [r0, #0x030]
-	ldr r1, =0x0000004F
+	ldr r1, =0x00000043
 	str r1, [r0, #0x040]
-	ldr r1, =0x84180000
+	ldr r1, =0x82180000
 	str r1, [r0, #0x000]
 	ldr r1, =0x02008032
 	str r1, [r0, #0x01C]
@@ -103,9 +103,9 @@
 	str r1, [r0, #0x01C]
 	ldr r1, =0x04008040
 	str r1, [r0, #0x01C]
-	ldr r1, =0x00000800
+	ldr r1, =0x00001800
 	str r1, [r0, #0x020]
-	ldr r1, =0x00000227
+	ldr r1, =0x00000117
 	str r1, [r0, #0x818]
 	ldr r1, =0x0002552D
 	str r1, [r0, #0x004]
@@ -134,6 +134,7 @@
 .macro imx6_ddr_setting
 	imx6ul_ddr3_arm2_setting
 .endm
+
 
 /* include the common plugin code here */
 #include <asm/arch/mx6_plugin.S>
