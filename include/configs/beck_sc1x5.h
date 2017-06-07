@@ -125,7 +125,7 @@
 #define CONFIG_AUTOBOOT_STOP_STR "\003"
 #define CONFIG_BOOTDELAY		1
 
-#define CONFIG_LOADADDR			0x80800000
+#define CONFIG_LOADADDR		0x80800000
 #define CONFIG_SYS_TEXT_BASE	0x87800000
 
 #define CONFIG_SYS_MMC_IMG_LOAD_PART	1
@@ -163,7 +163,7 @@
 	"bootdelay=1\0" \
     "ethact=FEC1\0"\
     "update_bootloader=dhcp qspi-u-boot.imx && sf probe && sf erase 0 0x00080000 && sf write ${fileaddr} 0 ${filesize}\0"\
-    "update_ubi=dhcp rootfs-" BOARD_STR ".ubifs && sf probe && sf erase 0x00090000 0x03f70000 && ubi part filesystem && ubi create rootfs && ubi write ${fileaddr} rootfs ${filesize}\0"\
+    "update_ubi=dhcp rootfs-" BOARD_STR ".ubifs && sf probe && sf erase 0x00090000 " FSSIZE_STR " && ubi part filesystem && ubi create rootfs && ubi write ${fileaddr} rootfs ${filesize}\0"\
     "kernelfile=uImage\0" \
     "fdtfile=imx6ul-" BOARD_STR "-db150.dtb\0" \
 	"init_ubifs=sf probe; mtdparts; ubi part filesystem; ubifsmount ubi0:rootfs\0" \
@@ -244,7 +244,6 @@
 #define CONFIG_LZO
 
 #ifdef CONFIG_FSL_QSPI
-#define FSL_QSPI_FLASH_SIZE		SZ_64M
 #define CONFIG_QSPI_BASE		QSPI1_BASE_ADDR
 #define CONFIG_QSPI_MEMMAP_BASE	QSPI1_ARB_BASE_ADDR
 
