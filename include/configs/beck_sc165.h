@@ -10,6 +10,7 @@
 #define PHYS_SDRAM_SIZE		SZ_512M
 #define BOARD_STR		"sc165"
 #define FSSIZE_STR		"0xff70000"
+#define FLASHSIZE_STR           "0x10000000"
 
 #ifdef CONFIG_FSL_QSPI
 #define FSL_QSPI_FLASH_SIZE	SZ_256M

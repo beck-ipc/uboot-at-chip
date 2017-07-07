@@ -152,7 +152,7 @@
 		"clk_ignore_unused "\
 		"\0" \
 	"bootcmd_mfg=run update_image_from_ram;\0" \
-        "update_image_from_ram=sf probe && sf erase 0 0x04000000 && sf write 0x81880000 0 0x04000000\0"\
+        "update_image_from_ram=sf probe && sf erase 0 " FLASHSIZE_STR " && sf write 0x81880000 0 0x04000000\0"\
 	"enet_phy_addr=1\0"
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
