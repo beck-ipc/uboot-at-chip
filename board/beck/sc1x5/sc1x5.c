@@ -34,6 +34,7 @@
 #endif
 #endif /*CONFIG_FASTBOOT*/
 
+#define ETH_ALEN    6
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -355,17 +356,42 @@ void board_late_mmc_init(void)
 #endif
 
 #ifdef CONFIG_FEC_MXC
+
+
+static void board_init_mac(void)
+{
+	u8 mac[ETH_ALEN];
+
+	imx_get_mac_from_fuse(0, mac);
+	if (!is_valid_ether_addr(mac)) {
+		printf("No valid MAC address in fuses\n");
+		return;
+	}
+	printf("MAC address from fuses: %pM\n", mac);
+	if (!getenv("ethaddr"))
+		eth_setenv_enetaddr("ethaddr", mac);
+
+	imx_get_mac_from_fuse(1, mac);
+	if (!is_valid_ether_addr(mac)) {
+		printf("No valid MAC for eth1 in fuses\n");
+		return;
+	}
+	eth_setenv_enetaddr("eth1addr", mac);
+}
+
 int board_eth_init(bd_t *bis)
 {
 	int ret;
 	int phyaddr;
+	
+	setup_iomux_fec(CONFIG_FEC_ENET_DEV);
 
-    setup_iomux_fec(CONFIG_FEC_ENET_DEV);
+	board_init_mac();
 
-    phyaddr = getenv_ulong("enet_phy_addr", 10, CONFIG_FEC_MXC_PHYADDR);
+	phyaddr = getenv_ulong("enet_phy_addr", 10, CONFIG_FEC_MXC_PHYADDR);
     
 	ret = fecmxc_initialize_multi(bis, CONFIG_FEC_ENET_DEV,	phyaddr, IMX_FEC_BASE);
-    if (ret)
+	if (ret)
 		printf("FEC%d MXC: %s:failed\n", CONFIG_FEC_ENET_DEV, __func__);
 
 	return 0;
